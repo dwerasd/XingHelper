@@ -578,12 +578,16 @@ BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUni
 	if (m_fpAdviseRealData)
 	{
 		//DBGPRINT("AdviseRealData - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
-		bReg = m_fpAdviseRealData(_hWnd, pszTrNo, pszData, nDataUnitLen);
-		if (bReg)
+		if (!is_reg_sub_info(pszTrNo, pszData))
 		{
-			//DBGPRINT("AdviseRealData success - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
-			this->reg_sub_info(pszTrNo, pszData, nDataUnitLen);
-			//DBGPRINT("Subscribe(%d) - key: %s, data: %s", bReg, pszTrNo, pszData ? pszData : "");
+			bReg = m_fpAdviseRealData(_hWnd, pszTrNo, pszData, nDataUnitLen);
+			if (bReg)
+			{
+				//DBGPRINT("AdviseRealData success - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
+				this->reg_sub_info(pszTrNo, pszData, nDataUnitLen);
+				//DBGPRINT("Subscribe(%d) - key: %s, data: %s", bReg, pszTrNo, pszData ? pszData : "");
+			}
+			
 		}
 		//else
 		//{

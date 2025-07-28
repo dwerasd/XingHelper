@@ -51,6 +51,7 @@ private:
 	volatile LONG nStatusXingAPI{ 0 }; // Ensure 'volatile' is used for atomic operations
 
 	xing::VEC_SUBSCRIBE_INFOS vSubscribeInfos; // 구독 정보 리스트
+	// key 는 중복 가능, 데이터도 중복 가능, key + 데이터는 중복 불가능.
 	inline void reg_sub_info(LPCSTR _pKey, LPCSTR _pData = nullptr, const int _nDataUnitLen = 0)
 	{
 		vSubscribeInfos.push_back(std::make_pair(_pKey, xing::_SUBSCRIBE_INFO{}));
@@ -60,6 +61,15 @@ private:
 			pLastRegInfo.second.szData = _pData;
 			pLastRegInfo.second.nDataUnitLen = _nDataUnitLen;
 		}
+	}
+
+	inline bool is_reg_sub_info(LPCSTR _pKey, LPCSTR _pData) const	// 이미 동일 key와 데이터가 등록되어 있는지 확인
+	{
+		auto it = std::find_if(vSubscribeInfos.begin(), vSubscribeInfos.end(),
+			[_pKey, _pData](const auto& pair) {
+				return pair.first == _pKey && pair.second.szData == _pData;
+			});
+		return it != vSubscribeInfos.end();
 	}
 
 	typedef std::unordered_map<std::string, xing::C_TR_TIME_CHECKER> UMAP_TR_TIMER_CHECKER;
