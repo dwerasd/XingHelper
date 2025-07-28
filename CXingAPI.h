@@ -4,8 +4,8 @@
 #include <DarkCore/DSingleton.h>
 #include <DarkCore/DEvent.h>
 
-#include <Packet/t0434.h>	// 선물/옵션 체결/미체결
-#include <Packet/t0441.h>	// 선물/옵션 잔고평가(이동평균)
+#include <Packet/t0434.h>			// 선물/옵션 체결/미체결
+#include <Packet/t0441.h>			// 선물/옵션 잔고평가(이동평균)
 
 #include <packet/t2101.h>
 #include <Packet/t2301.h>
@@ -15,9 +15,10 @@
 
 #include <Packet/OC0.h>
 #include <Packet/OH0.h>
-#include <Packet/O01.h>
-#include <packet/C01.h>
-#include <packet/H01.h>
+#include <Packet/O01.h>				// 주문한 선물 접수
+#include <packet/C01.h>				// 주문한 선옵 주문 체결
+#include <packet/H01.h>				// 주문한 정정 또는 취소
+
 
 #include <packet/CFOAT00100.h>
 #include <packet/CFOAT00200.h>
@@ -526,12 +527,22 @@ public:
 		dk::init(CFOAT00100InBlock, ' ');
 
 		xing::set_packet_data(CFOAT00100InBlock.AcntNo, sizeof(CFOAT00100InBlock.AcntNo), strFuOpAccNo.c_str(), DATA_TYPE_STRING);			// 계좌번호
-		xing::set_packet_data(CFOAT00100InBlock.Pwd, sizeof(CFOAT00100InBlock.Pwd), strFuOpAccPW.c_str(), DATA_TYPE_STRING);					// 비밀번호
+		xing::set_packet_data(CFOAT00100InBlock.Pwd, sizeof(CFOAT00100InBlock.Pwd), strFuOpAccPW.c_str(), DATA_TYPE_STRING);				// 비밀번호
 		xing::set_packet_data(CFOAT00100InBlock.FnoIsuNo, sizeof(CFOAT00100InBlock.FnoIsuNo), _pCode.data(), DATA_TYPE_STRING);				// 선물옵션종목번호
 		xing::set_packet_data(CFOAT00100InBlock.BnsTpCode, sizeof(CFOAT00100InBlock.BnsTpCode), "2", DATA_TYPE_STRING);						// 매매구분
 		xing::set_packet_data(CFOAT00100InBlock.FnoOrdprcPtnCode, sizeof(CFOAT00100InBlock.FnoOrdprcPtnCode), "00", DATA_TYPE_STRING);		// 선물옵션호가유형코드
 		xing::set_packet_data(CFOAT00100InBlock.FnoOrdPrc, sizeof(CFOAT00100InBlock.FnoOrdPrc), _pPrice.data(), DATA_TYPE_FLOAT_DOT, 8);	// 선물옵션주문가격
 		xing::set_packet_data(CFOAT00100InBlock.OrdQty, sizeof(CFOAT00100InBlock.OrdQty), _pQty.data(), DATA_TYPE_LONG);					// 주문수량
+
+		//DBGPRINT("IXingAPI::req_option_open() - AcntNo: %s, Pwd: %s, FnoIsuNo: %s, BnsTpCode: %c, FnoOrdprcPtnCode: %s, FnoOrdPrc: %s, OrdQty: %s",
+		//	strFuOpAccNo.c_str()
+		//	, strFuOpAccPW.c_str()
+		//	, _pCode.data()
+		//	, CFOAT00100InBlock.BnsTpCode
+		//	, CFOAT00100InBlock.FnoOrdprcPtnCode
+		//	, CFOAT00100InBlock.FnoOrdPrc
+		//	, _pQty.data()
+		//);
 
 		this->RequestWait("CFOAT00100", &CFOAT00100InBlock, sizeof(_CFOAT00100InBlock1));
 	}

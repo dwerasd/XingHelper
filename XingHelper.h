@@ -100,62 +100,62 @@ namespace xing
         switch (_bytType)
         {
         case DATA_TYPE_STRING:
-            {
-                // 왼쪽 정렬, ' '로 패딩
-                std::fill(dest.begin(), dest.end(), ' ');
-                const auto copy_len = min(dest.size(), src.length());
-                std::copy(src.begin(), src.begin() + copy_len, dest.begin());
-                break;
-            }
+        {
+            // 왼쪽 정렬, ' '로 패딩
+            std::fill(dest.begin(), dest.end(), ' ');
+            const auto copy_len = min(dest.size(), src.length());
+            std::copy(src.begin(), src.begin() + copy_len, dest.begin());
+            break;
+        }
         case DATA_TYPE_LONG:
-            {
-                // 오른쪽 정렬, '0'으로 패딩
-                std::fill(dest.begin(), dest.end(), '0');
-                if (src.length() >= dest.size()) {
-                    // 원본이 더 길면, 원본의 뒷부분을 잘라 채움 (오른쪽 정렬이므로)
-                    std::copy(src.end() - dest.size(), src.end(), dest.begin());
-                }
-                else {
-                    // 원본이 더 짧으면, 버퍼의 뒷부분에 맞추어 복사
-                    std::copy(src.begin(), src.end(), dest.end() - src.length());
-                }
-                break;
+        {
+            // 오른쪽 정렬, '0'으로 패딩
+            std::fill(dest.begin(), dest.end(), '0');
+            if (src.length() >= dest.size()) {
+                // 원본 함수와 동일하게: 원본의 앞부분을 복사
+                std::copy(src.begin(), src.begin() + dest.size(), dest.begin());
             }
+            else {
+                // 원본이 더 짧으면, 버퍼의 뒷부분에 맞추어 복사
+                std::copy(src.begin(), src.end(), dest.end() - src.length());
+            }
+            break;
+        }
         case DATA_TYPE_FLOAT:
         case DATA_TYPE_FLOAT_DOT:
-            {
-                // 실수 처리: 정수부와 소수부를 분리하여 각각 정렬
-                std::fill(dest.begin(), dest.end(), '0');
+        {
+            // 실수 처리: 정수부와 소수부를 분리하여 각각 정렬
+            std::fill(dest.begin(), dest.end(), '0');
 
-                const auto dot_pos_src = src.find('.');
-                const std::string_view src_int = (dot_pos_src == std::string_view::npos) ? src : src.substr(0, dot_pos_src);
-                const std::string_view src_frac = (dot_pos_src == std::string_view::npos) ? "" : src.substr(dot_pos_src + 1);
+            const auto dot_pos_src = src.find('.');
+            const std::string_view src_int = (dot_pos_src == std::string_view::npos) ? src : src.substr(0, dot_pos_src);
+            const std::string_view src_frac = (dot_pos_src == std::string_view::npos) ? "" : src.substr(dot_pos_src + 1);
 
-                // 목적지 버퍼에서 정수부와 소수부가 차지할 공간 계산
-                const size_t dest_frac_len = _bytDotPos;
-                const size_t dest_dot_len = (_bytType == DATA_TYPE_FLOAT) ? 1 : 0;
-                if (dest.size() < dest_frac_len + dest_dot_len) break; // 공간 부족
-                const size_t dest_int_len = dest.size() - dest_frac_len - dest_dot_len;
+            // 목적지 버퍼에서 정수부와 소수부가 차지할 공간 계산
+            const size_t dest_frac_len = _bytDotPos;
+            const size_t dest_dot_len = (_bytType == DATA_TYPE_FLOAT_DOT) ? 1 : 0;  // 수정됨
+            if (dest.size() < dest_frac_len + dest_dot_len) break; // 공간 부족
+            const size_t dest_int_len = dest.size() - dest_frac_len - dest_dot_len;
 
-                // 정수부 복사 (오른쪽 정렬)
-                if (src_int.length() >= dest_int_len) {
-                    std::copy(src_int.end() - dest_int_len, src_int.end(), dest.begin());
-                }
-                else {
-                    std::copy(src_int.begin(), src_int.end(), dest.begin() + dest_int_len - src_int.length());
-                }
-
-                // 소수점 복사 (필요 시)
-                if (dest_dot_len > 0) {
-                    dest[dest_int_len] = '.';
-                }
-
-                // 소수부 복사 (왼쪽 정렬, 뒷부분 잘림)
-                const auto frac_copy_len = min(dest_frac_len, src_frac.length());
-                std::copy(src_frac.begin(), src_frac.begin() + frac_copy_len, dest.begin() + dest_int_len + dest_dot_len);
-
-                break;
+            // 정수부 복사 (오른쪽 정렬) - 원본이 클 경우 앞부분 잘림으로 수정
+            if (src_int.length() >= dest_int_len) {
+                std::copy(src_int.begin(), src_int.begin() + dest_int_len, dest.begin());
             }
+            else {
+                std::copy(src_int.begin(), src_int.end(), dest.begin() + dest_int_len - src_int.length());
+            }
+
+            // 소수점 복사 (필요 시)
+            if (dest_dot_len > 0) {
+                dest[dest_int_len] = '.';
+            }
+
+            // 소수부 복사 (왼쪽 정렬, 뒷부분 잘림)
+            const auto frac_copy_len = min(dest_frac_len, src_frac.length());
+            std::copy(src_frac.begin(), src_frac.begin() + frac_copy_len, dest.begin() + dest_int_len + dest_dot_len);
+
+            break;
+        }
         }
     }
 
