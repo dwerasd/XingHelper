@@ -262,7 +262,7 @@ BOOL IXingAPI::Disconnect()
 			for (auto& itr : this->vSubscribeInfos)
 			{
 				//const BOOL bUnReg =
-					this->UnadviseRealData(itr.first.c_str(), itr.second.szData.c_str(), itr.second.nDataUnitLen);
+				this->UnadviseRealData(itr.first.c_str(), itr.second.szData.c_str());
 				//if (bUnReg)
 				//{
 				//	DBGPRINT("Unsubscribe(%d) - key: %s. data: %s", bUnReg, itr.first.c_str(), itr.second.szData.c_str());
@@ -572,11 +572,12 @@ int IXingAPI::RequestForce(LPCSTR _pTrCode, const LPVOID lpData, const int nData
 	return result;
 }
 
-BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUnitLen, const HWND _hWnd)
+BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const HWND _hWnd)
 {
 	BOOL bReg = FALSE;
 	if (m_fpAdviseRealData)
 	{
+		const int nDataUnitLen = static_cast<int>(pszData ? ::strlen(pszData) : 0);
 		//DBGPRINT("AdviseRealData - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
 		if (!is_reg_sub_info(pszTrNo, pszData))
 		{
@@ -585,9 +586,8 @@ BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUni
 			{
 				//DBGPRINT("AdviseRealData success - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
 				this->reg_sub_info(pszTrNo, pszData, nDataUnitLen);
-				DBGPRINT("Subscribe(%d) - key: %s, data: %s, %d, %p, %p", bReg, pszTrNo, pszData ? pszData : "", _hWnd, nDataUnitLen, hDefaultWnd);
+				//DBGPRINT("Subscribe(%d) - key: %s, data: %s, %d, %p, %p", bReg, pszTrNo, pszData ? pszData : "", _hWnd, nDataUnitLen, hDefaultWnd);
 			}
-			
 		}
 		//else
 		//{
@@ -597,16 +597,17 @@ BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUni
 	return(bReg);
 }
 
-BOOL IXingAPI::UnadviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUnitLen, const HWND _hWnd) const
+BOOL IXingAPI::UnadviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const HWND _hWnd) const
 {
-	DBGPRINT("UnadviseRealData - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
+	const int nDataUnitLen = static_cast<int>(pszData ? ::strlen(pszData) : 0);
+	//DBGPRINT("UnadviseRealData - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
 	if (m_fpUnadviseRealData) { return m_fpUnadviseRealData(_hWnd, pszTrNo, pszData, nDataUnitLen); }
 	return(FALSE);
 }
 
 BOOL IXingAPI::UnadviseWindow(const HWND _hWnd) const
 {
-	DBGPRINT("UnadviseWindow - hWnd: %x", _hWnd);
+	//DBGPRINT("UnadviseWindow - hWnd: %x", _hWnd);
 	if (m_fpUnadviseWindow) { return m_fpUnadviseWindow(_hWnd); }
 	return(FALSE);
 }

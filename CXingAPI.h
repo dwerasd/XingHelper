@@ -189,13 +189,13 @@ public:
 	BOOL	ReleaseMessageData(LPARAM lp) const;
 
 	// 실시간 관련
-	BOOL AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData = "", const int nDataUnitLen = 8, const HWND _hWnd = hDefaultWnd);
+	BOOL AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData = "", const HWND _hWnd = hDefaultWnd);
 	inline BOOL AdviseRealData(std::string_view pszTrNo, std::string_view pszData)
 	{
-		const int nDataUnitLen = static_cast<int>(pszData.length());
-		return AdviseRealData(pszTrNo.data(), pszData.data(), nDataUnitLen, hDefaultWnd);
+		//const int nDataUnitLen = static_cast<int>(pszData.length());
+		return AdviseRealData(pszTrNo.data(), pszData.data(), hDefaultWnd);
 	}
-	BOOL	UnadviseRealData(LPCSTR pszTrNo, LPCSTR pszData = "", const int nDataUnitLen = 8, const HWND _hWnd = hDefaultWnd) const;
+	BOOL	UnadviseRealData(LPCSTR pszTrNo, LPCSTR pszData = "", const HWND _hWnd = hDefaultWnd) const;
 	BOOL	UnadviseWindow(const HWND _hWnd = hDefaultWnd) const;
 
 	// 계좌 관련
