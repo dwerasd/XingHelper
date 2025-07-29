@@ -138,7 +138,7 @@ bool IXingAPI::init_functions()
 void IXingAPI::Initialize(HWND _hWnd)
 {
 	hDefaultWnd = _hWnd;
-	//DBGPRINT(L"IXingAPI::Initialize() hWnd: %x", hDefaultWnd);
+	DBGPRINT(L"IXingAPI::Initialize() hWnd: %x", hDefaultWnd);
 	wchar_t szCommLib[_MAX_PATH]{};
 	LPCWSTR pCurrentPath = dk::GetCurrentDirectoryW(szCommLib);
 	// \\XingAPI 폴더로 세팅.
@@ -585,7 +585,7 @@ BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUni
 			{
 				//DBGPRINT("AdviseRealData success - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
 				this->reg_sub_info(pszTrNo, pszData, nDataUnitLen);
-				//DBGPRINT("Subscribe(%d) - key: %s, data: %s", bReg, pszTrNo, pszData ? pszData : "");
+				DBGPRINT("Subscribe(%d) - key: %s, data: %s, %d, %p, %p", bReg, pszTrNo, pszData ? pszData : "", _hWnd, nDataUnitLen, hDefaultWnd);
 			}
 			
 		}
@@ -599,12 +599,14 @@ BOOL IXingAPI::AdviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUni
 
 BOOL IXingAPI::UnadviseRealData(LPCSTR pszTrNo, LPCSTR pszData, const int nDataUnitLen, const HWND _hWnd) const
 {
+	DBGPRINT("UnadviseRealData - key: %s, data: %s, nDataUnitLen: %d, hWnd: %x", pszTrNo, pszData ? pszData : "", nDataUnitLen, _hWnd);
 	if (m_fpUnadviseRealData) { return m_fpUnadviseRealData(_hWnd, pszTrNo, pszData, nDataUnitLen); }
 	return(FALSE);
 }
 
-BOOL IXingAPI::UnadviseWindow(HWND _hWnd) const
+BOOL IXingAPI::UnadviseWindow(const HWND _hWnd) const
 {
+	DBGPRINT("UnadviseWindow - hWnd: %x", _hWnd);
 	if (m_fpUnadviseWindow) { return m_fpUnadviseWindow(_hWnd); }
 	return(FALSE);
 }
