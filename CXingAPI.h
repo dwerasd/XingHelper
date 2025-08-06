@@ -484,6 +484,24 @@ public:
 	// 
 	int		Decompress(LPCSTR pszSrc, LPCSTR pszDest, int nSrcLen) const;
 
+	
+	//최대 매수 가능한 주식 수를 계산하는 함수
+	//
+	//@param max_amount: 최대 매수 금액 (기본값: 2000000원)
+	//@param current_price: 현재 주식 가격 (기본값: 0.53)
+	//@param unit_price_per_0_01: 0.01 가격 단위당 금액 (기본값: 2500원)
+	//@return: 매수 가능한 최대 주식 수 (정수)
+	inline int calc_qty(const double max_amount, const double current_price, double _db_price_per_0_01 = 2500) {
+		// 1주당 실제 매수 금액 계산
+		// 0.01로 나누기 대신 100을 곱하기로 변경 (성능 최적화)
+		constexpr double PRICE_MULTIPLIER = 100.0;  // 0.01 -> 1.0 변환용
+		const double price_per_share = current_price * PRICE_MULTIPLIER * _db_price_per_0_01;
+
+		// 최대 매수 가능한 주식 수 계산 (소수점 버림)
+		const int max_shares = static_cast<int>(max_amount / price_per_share);	// 변수로 나누기는 곱하기로 최적화 불가능
+		return max_shares;
+	}
+
 	//------------------------------------------------------------------------------
 	inline void req_t2101(std::string_view _pCode)
 	{	// 선물/옵션 현재가(시세) 조회, lastmonth 에 만기일이 있음.
@@ -602,7 +620,7 @@ public:
 		dk::init(CFOAT00300InBlock, ' ');
 
 		xing::set_packet_data(CFOAT00300InBlock.AcntNo, sizeof(CFOAT00300InBlock.AcntNo), strFuOpAccNo.c_str(), DATA_TYPE_STRING);			// 계좌번호
-		xing::set_packet_data(CFOAT00300InBlock.Pwd, sizeof(CFOAT00300InBlock.Pwd), strFuOpAccPW.c_str(), DATA_TYPE_STRING);					// 비밀번호
+		xing::set_packet_data(CFOAT00300InBlock.Pwd, sizeof(CFOAT00300InBlock.Pwd), strFuOpAccPW.c_str(), DATA_TYPE_STRING);				// 비밀번호
 		xing::set_packet_data(CFOAT00300InBlock.FnoIsuNo, sizeof(CFOAT00300InBlock.FnoIsuNo), _pCode.data(), DATA_TYPE_STRING);				// 선물옵션종목번호
 		xing::set_packet_data(CFOAT00300InBlock.OrgOrdNo, sizeof(CFOAT00300InBlock.OrgOrdNo), _pOrdNo.data(), DATA_TYPE_LONG);				// 원주문번호
 		xing::set_packet_data(CFOAT00300InBlock.CancQty, sizeof(CFOAT00300InBlock.CancQty), _pQty.data(), DATA_TYPE_LONG);					// 취소수량
@@ -619,7 +637,7 @@ public:
 	//	char    sortgb[1];    // [string,    1] 정렬순서                        StartPos 28, Length 1
 	//	char    cts_ordno[7];    // [string,    7] CTS_주문번호                    StartPos 29, Length 7
 	//} t0434InBlock, * LPt0434InBlock;
-	inline void req_option_chegye(std::string_view _pCode, std::string_view _pChegb = "0"
+	inline void req_option_chegyel(std::string_view _pCode, std::string_view _pChegb = "0"
 		, std::string_view _pCtsOrdNo = " ")
 	{
 		if (strFuOpAccNo.empty() || strFuOpAccPW.empty()) { return; }
